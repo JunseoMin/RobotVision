@@ -201,6 +201,39 @@ void MainFrame::on_pushCalibration_clicked()
         lF.push_back(mTmp);
     }
     
+    QStringList stlFile  =  QFileDialog::getOpenFileNames(this, tr("Select Feature Files"),
+                                                        "./data", "Text Files(*.txt)",0, q_Options);
+    if(stlFile.length() == 0)
+        return;
+
+    vector<Eigen::MatrixXf> lF2;
+
+    for(int i=0; i<stlFile.count(); i++)
+    {
+        //특징점 읽어들임
+        FILE*   fp  = fopen(stlFile.value(i).toStdString().c_str(),"rt");
+        int     row = 0;
+
+        std::vector<Eigen::Vector2f> points;
+        Eigen::Vector2f vTmp;
+
+        while(fscanf(fp, "%f %f\n", &vTmp(0), &vTmp(1)) == 2)
+        {   
+            // std::cout << vTmp(0) << '\n';
+            // std::cout << vTmp(1) << "\n\n";
+            points.push_back(vTmp);
+        }
+        fclose(fp);
+        Eigen::MatrixXf mTmp(points.size(), 2);
+        
+        for (size_t r = 0; r < points.size(); r++)
+        {
+            mTmp.row(r) = points[r];
+        }
+        
+        lF2.push_back(mTmp);
+    }
+
     //입력 모델점 파일 선택
     KString stPath   =  KString(stlFile.value(0).toStdString().c_str()).FilePathOnly();
     QString stModel  =  QFileDialog::getOpenFileName(this, tr("Select a Model File"),
@@ -238,26 +271,34 @@ void MainFrame::on_pushCalibration_clicked()
     ui->listWidget->show();
     ui->listWidget->addItem(QString(">> Start Calibration..."));
     ui->listWidget->show();
+    
+    Eigen::Matrix3d leftParam, rightParam;
+    std::vector<double> leftDistortion, rightDistortion;
 
     //아래를 완성하면 됩니다.
     KCalibrationZhang calib;
     calib.doCalib(lF, mM);
+    calib.getParam(leftParam, leftDistortion);
+
+    calib.doCalib(lF2, mM);
+    calib.getParam(rightParam, rightDistortion);
     
     // Codes for calib evaluation
-    calib.evalParamDiff();
-    calib.evalCoordDiff();
-    std::vector<float> evals;
-    evals = calib.getEval();
+    // calib.evalParamDiff();
+    // calib.evalCoordDiff();
+    // std::vector<float> evals;
+    // evals = calib.getEval();
     
-    ui->listWidget->addItem(QString(">> End Calibration"));
-    ui->listWidget->addItem(QString(">> ===== Left Param Difference =====\n Mean: %1 \n Std: %2")
-        .arg(evals[0])  // Param Error Mean
-        .arg(evals[1])); // Param Error Std
-    ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
-    .arg(evals[2])  // Projection Error Mean
-    .arg(evals[3])); // Projection Error Std
+    // ui->listWidget->addItem(QString(">> End Calibration"));
+    // ui->listWidget->addItem(QString(">> ===== Left Param Difference =====\n Mean: %1 \n Std: %2")
+    //     .arg(evals[0])  // Param Error Mean
+    //     .arg(evals[1])); // Param Error Std
+    // ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
+    // .arg(evals[2])  // Projection Error Mean
+    // .arg(evals[3])); // Projection Error Std
 
     
+
     
 
 }
