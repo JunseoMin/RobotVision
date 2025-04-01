@@ -242,20 +242,23 @@ void MainFrame::on_pushCalibration_clicked()
     //아래를 완성하면 됩니다.
     KCalibrationZhang calib;
     calib.doCalib(lF, mM);
-
+    
+    // Codes for calib evaluation
     calib.evalParamDiff();
     calib.evalCoordDiff();
-
     std::vector<float> evals;
     evals = calib.getEval();
-
+    
     ui->listWidget->addItem(QString(">> End Calibration"));
-    ui->listWidget->addItem(QString(">> ======== Param Difference ========\n Mean: %1 \n Std: %2")
+    ui->listWidget->addItem(QString(">> ===== Left Param Difference =====\n Mean: %1 \n Std: %2")
         .arg(evals[0])  // Param Error Mean
         .arg(evals[1])); // Param Error Std
     ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
     .arg(evals[2])  // Projection Error Mean
     .arg(evals[3])); // Projection Error Std
+
+    
+    
 
 }
 

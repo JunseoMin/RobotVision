@@ -471,3 +471,20 @@ std::vector<float> KCalibrationZhang::getEval(){
   eval.emplace_back(stdProj_);
   return eval;
 }
+
+/**
+ * @brief returns 3x3 camera intrinsic parameter matrix (eigen3dx)
+ * @param intrinsic 3x3 eigen matrix for camera intrinsic parameter
+ * @param dist distortion values
+ */
+void KCalibrationZhang::getParam(Eigen::Matrix3d& intrinsic, std::vector<double>& dist){
+  intrinsic = Eigen::Matrix3d::Identity();
+
+  intrinsic(0,0) = double(camParam_.fu);
+  intrinsic(1,1) = double(camParam_.fv);
+  intrinsic(2,0) = double(camParam_.uo);
+  intrinsic(2,1) = double(camParam_.vo);
+
+  dist.emplace_back(camParam_.k1);
+  dist.emplace_back(camParam_.k2);
+}

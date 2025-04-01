@@ -90,10 +90,11 @@ struct PointPair{
 class KCalibrationZhang
 {
 public:
-  KCalibrationZhang() = default;
+  KCalibrationZhang()   = default;
+
   void                  doCalib(const std::vector<Eigen::MatrixXf>& lFr, const Eigen::MatrixXf& mM);
   std::vector<float>    getEval();
-  KMONOCAM_PARAM*       getParam();
+  void                  getParam(Eigen::Matrix3d& intrinsic, std::vector<double>& dist);
   void                  evalParamDiff();
   void                  evalCoordDiff();
 
@@ -111,6 +112,7 @@ private:
   std::vector<Eigen::Matrix3f> homographies_;
   std::vector<Eigen::Vector3f> worldNormal_;  // Normalize coords
   std::vector<Eigen::Matrix4f> extrinsics_;   // SE(3) extrinsic parameter
+
   KMONOCAM_PARAM camParam_;                   // data for the monocamera calibration
   KMONOCAM_PARAM camParamIdeal_;              // data for the monocamera calibration
 
