@@ -95,6 +95,7 @@ public:
   void                  doCalib(const std::vector<Eigen::MatrixXf>& lFr, const Eigen::MatrixXf& mM);
   std::vector<float>    getEval();
   void                  getParam(Eigen::Matrix3d& intrinsic, std::vector<double>& dist);
+  void                  getExtrinsic(std::vector<Eigen::Matrix4f>& extrinsic);
   void                  evalParamDiff();
   void                  evalCoordDiff();
 

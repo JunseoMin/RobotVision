@@ -277,11 +277,22 @@ void MainFrame::on_pushCalibration_clicked()
 
     //아래를 완성하면 됩니다.
     KCalibrationZhang calib;
+
+    std::vector<Eigen::Matrix4f> lExtrinsic;
+    std::vector<Eigen::Matrix4f> rExtrinsic;
+
     calib.doCalib(lF, mM);
     calib.getParam(leftParam, leftDistortion);
+    calib.getExtrinsic(lextrinsic);
 
     calib.doCalib(lF2, mM);
     calib.getParam(rightParam, rightDistortion);
+    calib.getExtrinsic(rextrinsic);
+
+    ui->listWidget->addItem(QString(">> End Calibration"));
+    ui->listWidget->addItem(QString(">> Start Ratification"));
+
+    
     
     // Codes for calib evaluation
     // calib.evalParamDiff();

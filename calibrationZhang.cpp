@@ -488,3 +488,7 @@ void KCalibrationZhang::getParam(Eigen::Matrix3d& intrinsic, std::vector<double>
   dist.emplace_back(camParam_.k1);
   dist.emplace_back(camParam_.k2);
 }
+
+void KCalibrationZhang::getExtrinsic(std::vector<Eigen::Matrix4f>& extrinsics){
+  std::copy(extrinsics_.begin(), extrinsics_.end(), extrinsics.begin());
+}
