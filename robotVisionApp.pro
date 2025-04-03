@@ -25,13 +25,15 @@ SOURCES += main.cpp\
         mainframe.cpp \
     imageform.cpp \
     kfc.cpp \
-    optima.cpp
+    optima.cpp \
+    rectification.cpp
 
 HEADERS  += mainframe.h \
     calibrationZhang.h \
     imageform.h \
     kfc.h \
-    optima.h
+    optima.h \
+    rectification.h
 
 FORMS    += mainframe.ui \
     imageform.ui

@@ -245,7 +245,7 @@ void KCalibrationZhang::estimateIntrinsic_(){
 }
 
 /**
- * @brief Estimate extrinsic parameter from matrix.(This function saves initial value for optimization) 
+ * @brief Estimate extrinsic parameter from matrix
  */
 void KCalibrationZhang::estimateExtrinsic_() {
   for (const auto& H : homographies_) {
