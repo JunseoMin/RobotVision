@@ -9,6 +9,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <vector>
+#include <iostream>
 
 class Rectification
 {
@@ -41,7 +42,7 @@ private:
   std::vector<Eigen::Matrix4f> rExtrinsic_;
 
   std::vector<Eigen::Matrix4d> Trls_;       // Transformation left cam -> right cam
-  
+
   std::vector<Eigen::Matrix3d> newTrs_;
   std::vector<Eigen::Matrix3d> newTls_;
 };

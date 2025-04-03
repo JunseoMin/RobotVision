@@ -30,8 +30,8 @@ void KCalibrationZhang::doCalib(const std::vector<Eigen::MatrixXf>& lF, const Ei
      
     }
     // assert(worldRaws.size() == int(camRaws.size() / lF.size()));
-    std::cout << "world size: " << worldRaws.size() << "\n";
-    std::cout << "cam size: " << camRaws.size() << "\n";
+    // std::cout << "world size: " << worldRaws.size() << "\n";
+    // std::cout << "cam size: " << camRaws.size() << "\n";
 
     std::vector<Eigen::Vector3f> camNormal;
 
@@ -40,11 +40,11 @@ void KCalibrationZhang::doCalib(const std::vector<Eigen::MatrixXf>& lF, const Ei
       worldNormal_ = normalizePoint_(worldRaws, false);
     }
     
-    std::cout << "Normalization finished!" << '\n';
+    // std::cout << "Normalization finished!" << '\n';
 
     Eigen::Matrix3f H;  // Homograph matrix (3x3)
     H = calcHomography_(camNormal); // H -> unnormalized matrix
-    std::cout << "H returned \n";
+    // std::cout << "H returned \n";
     homographies_.emplace_back(H);  // append homography matrix
     // current flow :  (T^-1) (T H) | T -> normalization matrix
 
@@ -79,14 +79,14 @@ std::vector<Eigen::Vector3f> KCalibrationZhang::normalizePoint_(std::vector<Eige
   }
 
   float scale =  sqrt(2.f) / float(sumDist / n);
-  std::cout << "scale value: " << scale << '\n';
+  // std::cout << "scale value: " << scale << '\n';
   Eigen::Matrix3f T = Eigen::Matrix3f::Identity();
   T(0,0) = scale;
   T(1,1) = scale;
   T(0,2) = -scale * mean(0);
   T(1,2) = -scale * mean(1);
 
-  std::cout << "normalization matrix:\n" << T << '\n';
+  // std::cout << "normalization matrix:\n" << T << '\n';
 
   for (const auto& p : raw){
     normalized.emplace_back(T * p);
@@ -139,7 +139,7 @@ Eigen::Matrix3f KCalibrationZhang::calcHomography_(std::vector<Eigen::Vector3f>&
   //   A.row(3*i + 2) << -v*x, -v*y,  -v,  u*x, u*y,  u,    0,    0,   0;
   // }  // Results contains nan!!
 
-  std::cout << "A matrix finished!" << "\n";
+  // std::cout << "A matrix finished!" << "\n";
   
   Eigen::JacobiSVD<Eigen::MatrixXf> svd(A, Eigen::ComputeFullV);
   Eigen::VectorXf h = svd.matrixV().col(8); // get last columns
@@ -148,12 +148,12 @@ Eigen::Matrix3f KCalibrationZhang::calcHomography_(std::vector<Eigen::Vector3f>&
        h(3), h(4), h(5),
        h(6), h(7), h(8);
 
-  std::cout << "H matrix \n" << H << "\n";
+  // std::cout << "H matrix \n" << H << "\n";
 
   H = TNormInv_ * H * TNorm_;
   H /= H(2,2);
 
-  std::cout << "H matrix \n" << H << "\n";
+  // std::cout << "H matrix \n" << H << "\n";
 
   return H;
 }
@@ -197,7 +197,7 @@ void KCalibrationZhang::estimateIntrinsic_(){
   }
 
   Eigen::JacobiSVD<Eigen::MatrixXf> svd(V, Eigen::ComputeFullV);
-  std::cout << "Singular values of V: \n" << svd.singularValues().transpose() << "\n";
+  // std::cout << "Singular values of V: \n" << svd.singularValues().transpose() << "\n";
   Eigen::VectorXf B = svd.matrixV().col(svd.matrixV().cols() - 1);
 
   Eigen::Matrix3f Bmat;
@@ -226,14 +226,14 @@ void KCalibrationZhang::estimateIntrinsic_(){
   float u0     = gamma * v0 / alpha - ((b13 * alpha * alpha) / lambda);
   
 
-  std::cout << "B matrix: \n " << Bmat << '\n'; // TODO: B has a negative value
-  std::cout << "lambda: " << lambda << "\n";
+  // std::cout << "B matrix: \n " << Bmat << '\n'; // TODO: B has a negative value
+  // std::cout << "lambda: " << lambda << "\n";
   
   A_ << alpha , 0     , u0,
         0     , beta  , v0,
         0     , 0     , 1;
 
-  std::cout << "Intrinsic Parameter: \n" << A_ << "\n";
+  // std::cout << "Intrinsic Parameter: \n" << A_ << "\n";
   
   camParamIdeal_.uo    = float(u0);
   camParamIdeal_.vo    = float(v0);
@@ -272,7 +272,7 @@ void KCalibrationZhang::estimateExtrinsic_() {
 
     extrinsics_.push_back(extrinsic);
 
-    std::cout << "Extrinsic param SE(3):\n" << extrinsic << '\n';
+    // std::cout << "Extrinsic param SE(3):\n" << extrinsic << '\n';
   }
 }
 
@@ -326,7 +326,7 @@ void KCalibrationZhang::optimizeParams_(){
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 
-  std::cout << "Optimization Summary: \n" << summary.FullReport() << "\n";
+  // std::cout << "Optimization Summary: \n" << summary.FullReport() << "\n";
 
   camParam_.fu = static_cast<float>(params[0]);
   camParam_.fv = static_cast<float>(params[1]);
@@ -482,13 +482,13 @@ void KCalibrationZhang::getParam(Eigen::Matrix3d& intrinsic, std::vector<double>
 
   intrinsic(0,0) = double(camParam_.fu);
   intrinsic(1,1) = double(camParam_.fv);
-  intrinsic(2,0) = double(camParam_.uo);
-  intrinsic(2,1) = double(camParam_.vo);
+  intrinsic(0,2) = double(camParam_.uo);
+  intrinsic(1,2) = double(camParam_.vo);
 
-  dist.emplace_back(camParam_.k1);
-  dist.emplace_back(camParam_.k2);
+  dist = {camParam_.k1, camParam_.k2};
 }
 
 void KCalibrationZhang::getExtrinsic(std::vector<Eigen::Matrix4f>& extrinsics){
+  extrinsics.resize(extrinsics_.size());
   std::copy(extrinsics_.begin(), extrinsics_.end(), extrinsics.begin());
 }

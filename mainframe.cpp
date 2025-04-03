@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QPainter>
 #include "calibrationZhang.h"
+#include "rectification.h"
 
 using namespace std;
 
@@ -201,17 +202,17 @@ void MainFrame::on_pushCalibration_clicked()
         lF.push_back(mTmp);
     }
     
-    QStringList stlFile  =  QFileDialog::getOpenFileNames(this, tr("Select Feature Files"),
+    QStringList stlFile2  =  QFileDialog::getOpenFileNames(this, tr("Select Feature Files"),
                                                         "./data", "Text Files(*.txt)",0, q_Options);
-    if(stlFile.length() == 0)
+    if(stlFile2.length() == 0)
         return;
 
     vector<Eigen::MatrixXf> lF2;
 
-    for(int i=0; i<stlFile.count(); i++)
+    for(int i=0; i<stlFile2.count(); i++)
     {
         //특징점 읽어들임
-        FILE*   fp  = fopen(stlFile.value(i).toStdString().c_str(),"rt");
+        FILE*   fp  = fopen(stlFile2.value(i).toStdString().c_str(),"rt");
         int     row = 0;
 
         std::vector<Eigen::Vector2f> points;
@@ -250,8 +251,8 @@ void MainFrame::on_pushCalibration_clicked()
     Eigen::Vector2f vTmp;
     while(fscanf(fp, "%f %f", &vTmp(0), &vTmp(1)) == 2)
     {
-        std::cout << vTmp(0) << '\n';
-        std::cout << vTmp(1) << "\n\n";
+        // std::cout << vTmp(0) << '\n';
+        // std::cout << vTmp(1) << "\n\n";
         modelPoints.push_back(vTmp);
     }
     fclose(fp);
@@ -282,18 +283,24 @@ void MainFrame::on_pushCalibration_clicked()
     std::vector<Eigen::Matrix4f> rExtrinsic;
 
     calib.doCalib(lF, mM);
+    std::cout << "Left finished!\n";
     calib.getParam(leftParam, leftDistortion);
-    calib.getExtrinsic(lextrinsic);
+    std::cout << "Param loaded\n";
+    calib.getExtrinsic(lExtrinsic);
+    std::cout << "Extrinsic loaded\n";
 
     calib.doCalib(lF2, mM);
     calib.getParam(rightParam, rightDistortion);
-    calib.getExtrinsic(rextrinsic);
+    calib.getExtrinsic(rExtrinsic);
+    std::cout << "Right finished!\n";
 
     ui->listWidget->addItem(QString(">> End Calibration"));
     ui->listWidget->addItem(QString(">> Start Ratification"));
 
-    
-    
+    Rectification rectifier;
+
+    rectifier.setParam(leftParam,rightParam,leftDistortion,rightDistortion,lExtrinsic,rExtrinsic,mM);
+    rectifier.run();
     // Codes for calib evaluation
     // calib.evalParamDiff();
     // calib.evalCoordDiff();
