@@ -6,10 +6,15 @@
 #ifndef rectificationH
 #define rectificationH
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <vector>
 #include <iostream>
+#include "utills.hpp"
 
 class Rectification
 {
@@ -22,8 +27,8 @@ public:
                 std::vector<Eigen::Matrix4f> rExtrinsic,  // Contains global frame's pose reference to camera (Trg)
                 Eigen::MatrixXf& modelPoints
               );
-  void setImages();
-  void getImages();
+  void visualize(std::vector<cv::Mat>& leftImages, 
+                 std::vector<cv::Mat>& rightImages);
   void run();
 
 
@@ -45,6 +50,8 @@ private:
 
   std::vector<Eigen::Matrix3d> newTrs_;
   std::vector<Eigen::Matrix3d> newTls_;
+
+  std::vector<cv::Mat> images_;
 };
 
 

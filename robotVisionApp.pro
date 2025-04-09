@@ -33,7 +33,8 @@ HEADERS  += mainframe.h \
     imageform.h \
     kfc.h \
     optima.h \
-    rectification.h
+    rectification.h \
+    utills.hpp 
 
 FORMS    += mainframe.ui \
     imageform.ui
@@ -46,9 +47,12 @@ INCLUDEPATH += /usr/include/eigen3\
             /usr/local/include\
             /usr/local/lib\
             /usr/local/lib/cmake/\
+            /usr/include/opencv4 \
+
 
 LIBS += -L/usr/local/lib -lglog -lceres
-
+CONFIG += link_pkgconfig
+PKGCONFIG += opencv4
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

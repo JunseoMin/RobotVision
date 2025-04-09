@@ -6,8 +6,14 @@
 
 #include <QFileDialog>
 #include <QPainter>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include "calibrationZhang.h"
 #include "rectification.h"
+
 
 using namespace std;
 
@@ -295,12 +301,15 @@ void MainFrame::on_pushCalibration_clicked()
     std::cout << "Right finished!\n";
 
     ui->listWidget->addItem(QString(">> End Calibration"));
-    ui->listWidget->addItem(QString(">> Start Ratification"));
+    ui->listWidget->addItem(QString(">> Start Ratification ..."));
 
     Rectification rectifier;
 
     rectifier.setParam(leftParam,rightParam,leftDistortion,rightDistortion,lExtrinsic,rExtrinsic,mM);
     rectifier.run();
+    ui->listWidget->addItem(QString(">> End rectification"));
+    
+
     // Codes for calib evaluation
     // calib.evalParamDiff();
     // calib.evalCoordDiff();
@@ -314,10 +323,36 @@ void MainFrame::on_pushCalibration_clicked()
     // ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
     // .arg(evals[2])  // Projection Error Mean
     // .arg(evals[3])); // Projection Error Std
-
+    ui->listWidget->addItem(QString(">> Start rectification visualize ..."));
     
+    QStringList bmpFiles = QFileDialog::getOpenFileNames(this, tr("Select Left BMP Images"),
+    "./data", "BMP Files(*.bmp)", 0, q_Options);
+    if (bmpFiles.length() == 0) return;
 
-    
+    std::vector<cv::Mat> leftImages;
+    for (const QString& file : bmpFiles)
+    {
+        cv::Mat img = cv::imread(file.toStdString(), cv::IMREAD_COLOR);
+        if (!img.empty())
+        {
+            leftImages.push_back(img);
+        }
+    }
 
+    QStringList RbmpFiles = QFileDialog::getOpenFileNames(this, tr("Select Right BMP Images"),
+    "./data", "BMP Files(*.bmp)", 0, q_Options);
+    if (RbmpFiles.length() == 0) return;
+
+    std::vector<cv::Mat> rightImages;
+    for (const QString& file : RbmpFiles)
+    {
+        cv::Mat img = cv::imread(file.toStdString(), cv::IMREAD_COLOR);
+        if (!img.empty())
+        {
+            rightImages.push_back(img);
+        }
+    }
+
+    rectifier.visualize(leftImages, rightImages);   
 }
 
