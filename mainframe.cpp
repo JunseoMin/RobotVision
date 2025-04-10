@@ -295,9 +295,11 @@ void MainFrame::on_pushCalibration_clicked()
     calib.getExtrinsic(lExtrinsic);
     std::cout << "Extrinsic loaded\n";
 
-    calib.doCalib(lF2, mM);
-    calib.getParam(rightParam, rightDistortion);
-    calib.getExtrinsic(rExtrinsic);
+    KCalibrationZhang calibR;
+
+    calibR.doCalib(lF2, mM);
+    calibR.getParam(rightParam, rightDistortion);
+    calibR.getExtrinsic(rExtrinsic);
     std::cout << "Right finished!\n";
 
     ui->listWidget->addItem(QString(">> End Calibration"));
@@ -311,20 +313,31 @@ void MainFrame::on_pushCalibration_clicked()
     
 
     // Codes for calib evaluation
-    // calib.evalParamDiff();
-    // calib.evalCoordDiff();
-    // std::vector<float> evals;
-    // evals = calib.getEval();
+    calib.evalParamDiff();
+    calib.evalCoordDiff();
+    std::vector<float> evals;
+    evals = calib.getEval();
     
-    // ui->listWidget->addItem(QString(">> End Calibration"));
-    // ui->listWidget->addItem(QString(">> ===== Left Param Difference =====\n Mean: %1 \n Std: %2")
-    //     .arg(evals[0])  // Param Error Mean
-    //     .arg(evals[1])); // Param Error Std
-    // ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
-    // .arg(evals[2])  // Projection Error Mean
-    // .arg(evals[3])); // Projection Error Std
+    ui->listWidget->addItem(QString(">> ===== Left Param =====")
+        .arg(evals[0])  // Param Error Mean
+        .arg(evals[1])); // Param Error Std
+    ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
+    .arg(evals[2])  // Projection Error Mean
+    .arg(evals[3])); // Projection Error Std
+
+    calibR.evalParamDiff();
+    calibR.evalCoordDiff();
+    std::vector<float> evalsR;
+    evalsR = calibR.getEval();
+    
+    ui->listWidget->addItem(QString(">> ===== Right Param =====")
+        .arg(evalsR[0])  // Param Error Mean
+        .arg(evalsR[1])); // Param Error Std
+    ui->listWidget->addItem(QString(">> ===== Projection Error(pixel) =====\n Mean: %1 \n RMSE: %2")
+    .arg(evalsR[2])  // Projection Error Mean
+    .arg(evalsR[3])); // Projection Error Std
+
     ui->listWidget->addItem(QString(">> Start rectification visualize ..."));
-    
     QStringList bmpFiles = QFileDialog::getOpenFileNames(this, tr("Select Left BMP Images"),
     "./data", "BMP Files(*.bmp)", 0, q_Options);
     if (bmpFiles.length() == 0) return;
