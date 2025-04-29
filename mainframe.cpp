@@ -207,7 +207,8 @@ void MainFrame::on_pushCalibration_clicked()
         
         lF.push_back(mTmp);
     }
-    
+
+    /*
     QStringList stlFile2  =  QFileDialog::getOpenFileNames(this, tr("Select Feature Files"),
                                                         "./data", "Text Files(*.txt)",0, q_Options);
     if(stlFile2.length() == 0)
@@ -240,6 +241,7 @@ void MainFrame::on_pushCalibration_clicked()
         
         lF2.push_back(mTmp);
     }
+    */ // Rectification
 
     //입력 모델점 파일 선택
     KString stPath   =  KString(stlFile.value(0).toStdString().c_str()).FilePathOnly();
@@ -279,6 +281,25 @@ void MainFrame::on_pushCalibration_clicked()
     ui->listWidget->addItem(QString(">> Start Calibration..."));
     ui->listWidget->show();
     
+    // AX=ZB
+
+    //1. Calibration
+    Eigen::Matrix3d Param;
+    std::vector<double> Distortion;
+    KCalibrationZhang calib;
+    std::vector<Eigen::Matrix4f> Extrinsic;
+    
+    calib.doCalib(lF, mM);
+    calib.getParam(Param, Distortion);
+    calib.getExtrinsic(Extrinsic);
+    
+    ui->listWidget->addItem(QString(">> End Calibration"));
+    ui->listWidget->addItem(QString(">> Start Hand-eye calibration ..."));
+
+    // Apply AX=ZB
+    
+
+    /* Rectification Example
     Eigen::Matrix3d leftParam, rightParam;
     std::vector<double> leftDistortion, rightDistortion;
 
@@ -367,5 +388,6 @@ void MainFrame::on_pushCalibration_clicked()
     }
 
     rectifier.visualize(leftImages, rightImages);   
+    */    //Rectification example
 }
 

@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     imageform.cpp \
     kfc.cpp \
     optima.cpp \
-    rectification.cpp
+    rectification.cpp \
+    AXZB.cpp
 
 HEADERS  += mainframe.h \
     calibrationZhang.h \
@@ -34,7 +35,8 @@ HEADERS  += mainframe.h \
     kfc.h \
     optima.h \
     rectification.h \
-    utills.hpp 
+    utills.hpp \
+    AXZB.hpp
 
 FORMS    += mainframe.ui \
     imageform.ui
