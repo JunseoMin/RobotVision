@@ -27,6 +27,22 @@ inline void inverseSO3(Eigen::Matrix3d& rotation){
   rotation = rotation.transpose();
 }
 
+inline Eigen::Matrix4d inverseSE3(Eigen::Matrix4d& transform){
+  Eigen::Matrix4d inversed;
+
+  Eigen::Matrix3d rotation = transform.block<3,3>(0,0);
+  Eigen::Vector3d translation = transform.block<3,1>(0,3);
+
+  rotation = rotation.transpose();
+  translation = -rotation * translation;
+
+  inversed.setIdentity();
+  inversed.block<3,3>(0,0) = rotation;
+  inversed.block<3,1>(0,3) = translation;
+
+  return inversed;
+}
+
 inline void q2Q(Eigen::Quaterniond& q, Eigen::Matrix4d& Q){
   Q.setIdentity();
   Q(0,0) = q.w(); Q(0,1) = -q.x(); Q(0,2) = -q.y(); Q(0,3) = -q.z();
